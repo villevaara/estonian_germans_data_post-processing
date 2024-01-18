@@ -4,7 +4,7 @@
 # Let's load that into memory, and throw out all but the Estonian and German first names.
 
 # load libraries:
-# pandas is a nice data science library, very handy here
+# pandas is a nice data science library, very handy here for reading and writing csv tables.
 
 import pandas as pd
 
@@ -13,7 +13,7 @@ import pandas as pd
 firstnames_df = pd.read_csv('data/firstnames.csv', sep=";")
 
 # discard rows that do not have a value in 'Germany' or 'Estonia' -columns
-# With this data you might want to
+# You might want to look for another dataset of historical names, or keep more (or all) languages from this one.
 firstnames_df = firstnames_df[~firstnames_df.Germany.isna() | ~firstnames_df.Estonia.isna()]
 
 # only keep columns for name, gender
@@ -42,6 +42,7 @@ get_gender_for_firstname('Anna', firstnames_dict)
 # https://pypi.org/project/fuzzywuzzy/
 
 
+# load the fuzzy matching functions
 from fuzzywuzzy import process
 
 
@@ -55,11 +56,13 @@ process.extractOne(query="Amma", choices=choices)
 
 # Modify the simple function above to include a guesser if no exact match is found:
 def get_gender_for_firstname_guesser(firstname, gender_dict, threshold=75):
-    if firstname.lower() in gender_dict.keys():
-        return {'gender': gender_dict[firstname.lower()], 'gender_name_match': 'exact'}
+    query_name = firstname.lower()
+    if query_name in gender_dict.keys():
+        return {'gender': gender_dict[query_name], 'gender_name_match': 'exact'}
     else:
         choices = list(firstnames_dict.keys())
-        guess = process.extractOne(query=firstname, choices=choices)
+        guess = process.extractOne(query=query_name, choices=choices)
+        # This returns a tuple eg. ('alma', 75), with the best matching name in position 0 and match % in 1.
         # If the match threshold (percentage) is equal or greater than that set in the function parameters,
         # return the result. It's a good idea to show how it was obtained too.
         if guess[1] >= threshold:
@@ -76,19 +79,20 @@ get_gender_for_firstname_guesser('Ocrnoise', firstnames_dict, threshold=75)
 
 
 # and let's apply that to a mock dataset:
+
+# read mock data
 testdata = pd.read_csv('data/mockdata.csv')
 
 # add columns for gender and gender match method to the dataset:
 testdata['gender'] = ''
 testdata['gender_name_match'] = ''
 
-# and then iterate over the data, assigning genders:
-
+# iterate over the data row by row, assigning genders:
 for index, row in testdata.iterrows():
     genderdata = get_gender_for_firstname_guesser(row['first_name'], firstnames_dict, threshold=75)
-    print(genderdata)
+    # print(genderdata)
     testdata['gender'][index] = genderdata['gender']
     testdata['gender_name_match'][index] = genderdata['gender_name_match']
 
-# and write the results:
+# write the results:
 testdata.to_csv('data/testdata_out.csv', index=False)
