@@ -1,0 +1,7 @@
+first_name,family_name,fathers_name,occupation,date_of_birth,marital_status,gender,gender_name_match
+Amma,Kugelberg,Andreas,-,23.11.1876,-,F,fuzzy
+Jan,Hus,Johan,-,12.12.1865,married,M,exact
+Heidi,Krankenweis,Felix,nurse,1.9.1876,married,F,exact
+Rosa,Luxemburg,Peter,speaker,21.6.1898,single,F,exact
+Andreas,von Strandhoff,Hans,count,5.7.1869,widower,M,exact
+Ocrnoise,Randomhoff,Morenoise,-,35.13.1977,mrried,F,fuzzy
